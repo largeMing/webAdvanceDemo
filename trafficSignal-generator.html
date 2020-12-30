@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        div {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #999;
+        }
+
+        .red.lights {
+            background: red;
+        }
+
+        .yellow.lights {
+            background: yellow;
+        }
+
+        .green.lights {
+            background: green;
+        }
+    </style>
+</head>
+<body>
+<div class="green"></div>
+<div class="yellow"></div>
+<div class="red"></div>
+<script>
+    function green() {
+        let lights = document.querySelectorAll("div")
+        for (let i = 0; i < 3; i++) {
+            lights[i].classList.remove('lights')
+        }
+        document.querySelector('.green').classList.add('lights')
+    }
+
+    function yellow() {
+        let lights = document.querySelectorAll("div")
+        for (let i = 0; i < 3; i++) {
+            lights[i].classList.remove('lights')
+        }
+        document.querySelector('.yellow').classList.add('lights')
+    }
+
+    function red() {
+        let lights = document.querySelectorAll("div")
+        for (let i = 0; i < 3; i++) {
+            lights[i].classList.remove('lights')
+        }
+        document.querySelector('.red').classList.add('lights')
+    }
+
+    function sleep(t) {
+        return new Promise(((resolve, reject) => {
+            setTimeout(resolve, t)
+        }))
+    }
+
+    function* go() {
+        while (true) {
+            green()
+            yield sleep(1000)
+            yellow()
+            yield sleep(200)
+            red()
+            yield sleep(500)
+        }
+    }
+
+    function run(iterator) {
+        let {value, done} = iterator.next()
+        if (done)
+            return
+        if (value instanceof Promise) {
+            value.then(() => {
+                run(iterator)
+            })
+        }
+    }
+
+    function co(generator) {
+        return function () {
+            return run(generator())
+        }
+    }
+
+    go = co(go)
+
+</script>
+</body>
+</html>
